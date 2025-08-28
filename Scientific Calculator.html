@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pro Scientific Calculator</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #f3f4f6;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .calculator {
+      background: white;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-width: 360px;
+      width: 100%;
+    }
+
+    .display {
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 20px;
+      font-size: 2rem;
+      text-align: right;
+      margin-bottom: 20px;
+      overflow-x: auto;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+
+    button {
+      padding: 18px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      background: #f3f4f6;
+    }
+
+    button:active {
+      transform: scale(0.95);
+    }
+
+    /* Wide buttons */
+    .span-2 {
+      grid-column: span 2;
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <div class="display" id="display">0</div>
+    <div class="buttons">
+      <button>(</button>
+      <button>)</button>
+      <button>sin</button>
+      <button>cos</button>
+      <button>tan</button>
+
+      <button>log</button>
+      <button>ln</button>
+      <button>√</button>
+      <button>^</button>
+      <button>!</button>
+
+      <button>π</button>
+      <button>e</button>
+      <button>MC</button>
+      <button>MR</button>
+      <button>M+</button>
+
+      <button>M-</button>
+      <button>AC</button>
+      <button>7</button>
+      <button>8</button>
+      <button>9</button>
+
+      <button>÷</button>
+      <button>⌫</button>
+      <button>4</button>
+      <button>5</button>
+      <button>6</button>
+
+      <button>×</button>
+      <button>%</button>
+      <button>1</button>
+      <button>2</button>
+      <button>3</button>
+
+      <button>−</button>
+      <button>0</button>
+      <button>.</button>
+      <button>=</button>
+      <button>+</button>
+    </div>
+  </div>
+
+  <script>
+    const display = document.getElementById("display");
+    const buttons = document.querySelectorAll("button");
+    let memory = 0;
+
+    // Factorial function
+    function factorial(n) {
+      if (n < 0) return NaN;
+      if (n === 0 || n === 1) return 1;
+      return n * factorial(n - 1);
+    }
+
+    buttons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        let val = btn.textContent;
+
+        if (val === "AC") {
+          display.textContent = "0";
+        } else if (val === "⌫") {
+          display.textContent = display.textContent.slice(0, -1) || "0";
+        } else if (val === "=") {
+          try {
+            let expr = display.textContent
+              .replace(/÷/g, "/")
+              .replace(/×/g, "*")
+              .replace(/−/g, "-")
+              .replace(/\^/g, "**")
+              .replace(/π/g, `(${Math.PI})`)
+              .replace(/\be\b/g, `(${Math.E})`)
+              .replace(/√\(?/g, "Math.sqrt(")   
+              // convert trig functions to degrees
+              .replace(/sin\(/g, "Math.sin(Math.PI/180*")
+              .replace(/cos\(/g, "Math.cos(Math.PI/180*")
+              .replace(/tan\(/g, "Math.tan(Math.PI/180*")
+              .replace(/log\(/g, "Math.log10(")
+              .replace(/ln\(/g, "Math.log(")
+              .replace(/(\d+)!/g, "factorial($1)");
+
+            let result = eval(expr);
+            display.textContent = parseFloat(result.toFixed(10));
+          } catch {
+            display.textContent = "Error";
+          }
+        } else if (val === "MC") {
+          memory = 0;
+        } else if (val === "MR") {
+          display.textContent = memory.toString();
+        } else if (val === "M+") {
+          memory += Number(display.textContent) || 0;
+        } else if (val === "M-") {
+          memory -= Number(display.textContent) || 0;
+        } else {
+          if (display.textContent === "0" || display.textContent === "Error") {
+            display.textContent = val;
+          } else {
+            display.textContent += val;
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
